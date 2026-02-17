@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sekretariat Winter – Terminkalender</title>
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --navy:      #0a1450;
+      --navy-deep: #060d38;
+      --navy-mid:  #0f1c6b;
+      --navy-soft: #141e6e22;
+      --gold:      #d4af37;
+      --gold-soft: #d4af3722;
+      --gold-glow: #d4af3744;
+      --gold-dim:  #a88a28;
+      --bg:        #07103d;
+      --surface:   #0c1858;
+      --surface2:  #0f1e6a;
+      --border:    rgba(212,175,55,0.15);
+      --border2:   rgba(212,175,55,0.08);
+      --text:      #eef0ff;
+      --text-dim:  #8892c4;
+      --text-mute: #4a5490;
+      --red:       #e05555;
+      --green:     #2ecc71;
+      --schatten:  0 8px 40px rgba(0,0,0,0.5);
+      --radius:    16px;
+      --radius-sm: 10px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      font-family: 'Outfit', sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(212,175,55,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 90% 90%, rgba(10,20,80,0.8) 0%, transparent 60%);
+    }
+
+    /* ── SCROLLBAR ──────────────────────────────── */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* ── HEADER ─────────────────────────────────── */
+    header {
+      background: rgba(7,16,61,0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px; position: sticky; top: 0; z-index: 100;
+    }
+
+    .header-logo { display: flex; align-items: center; gap: 12px; }
+
+    .logo-mark {
+      width: 32px; height: 32px;
+      border: 1.5px solid var(--gold);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      box-shadow: 0 0 12px var(--gold-glow);
+    }
+
+    .logo-text { display: flex; flex-direction: column; }
+    .logo-title {
+      font-size: 14px; font-weight: 600; letter-spacing: 0.02em;
+      background: linear-gradient(135deg, #fff 0%, var(--gold) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .logo-sub {
+      font-size: 10px; color: var(--text-mute); letter-spacing: 0.12em;
+      text-transform: uppercase; font-weight: 400;
+    }
+
+    .header-center {
+      font-size: 13px; color: var(--text-dim); font-weight: 300;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── LAYOUT ─────────────────────────────────── */
+    .main-container {
+      max-width: 1140px; margin: 0 auto; padding: 40px 24px;
+      display: grid; grid-template-columns: 360px 1fr; gap: 24px;
+    }
+
+    /* ── STATUS BAR ─────────────────────────────── */
+    .status-bar {
+      grid-column: 1 / -1;
+      background: rgba(12,24,88,0.6);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 20px;
+      display: flex; align-items: center; gap: 10px;
+      backdrop-filter: blur(12px);
+    }
+
+    .status-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--text-mute); flex-shrink: 0;
+      animation: pulse 2.5s ease-in-out infinite;
+    }
+    .status-dot.online  { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .status-dot.offline { background: var(--red);   box-shadow: 0 0 8px var(--red); }
+
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.35; } }
+
+    .status-text { font-size: 12.5px; color: var(--text-dim); font-weight: 400; }
+    .status-text strong { color: var(--text); font-weight: 500; }
+    .status-hint { margin-left: auto; font-size: 11.5px; color: var(--text-mute); }
+
+    /* ── CARD ───────────────────────────────────── */
+    .card {
+      background: rgba(12,24,88,0.55);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: var(--schatten);
+    }
+
+    .card-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border2);
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .card-header-icon {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: var(--gold-soft);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+
+    .card-header h2 {
+      font-size: 14px; font-weight: 600;
+      letter-spacing: 0.01em; color: var(--text);
+    }
+
+    .count-badge {
+      margin-left: auto;
+      background: var(--gold-soft);
+      border: 1px solid var(--border);
+      color: var(--gold);
+      font-size: 11px; font-weight: 600;
+      padding: 2px 10px; border-radius: 20px;
+    }
+
+    /* ── FORMULAR ───────────────────────────────── */
+    .form-body { padding: 24px; }
+    .form-group { margin-bottom: 18px; }
+
+    label {
+      display: block; font-size: 11px; font-weight: 500;
+      color: var(--text-mute); letter-spacing: 0.1em;
+      text-transform: uppercase; margin-bottom: 7px;
+    }
+
+    input[type="text"], input[type="date"], input[type="time"],
+    input[type="url"], textarea, select {
+      width: 100%; padding: 11px 14px;
+      background: rgba(7,16,61,0.7);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 400;
+      color: var(--text); outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      -webkit-appearance: none; appearance: none;
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%238892c4' d='M5 7L1 3h8z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 38px;
+      cursor: pointer;
+    }
+    select option { background: #0c1858; color: #eef0ff; }
+
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.5); cursor: pointer; }
+
+    input::placeholder, textarea::placeholder { color: var(--text-mute); }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: rgba(212,175,55,0.5);
+      background: rgba(10,20,80,0.8);
+      box-shadow: 0 0 0 3px var(--gold-soft);
+    }
+
+    /* Empfänger gold */
+    #inp-empfaenger { border-color: rgba(212,175,55,0.3); }
+
+    textarea { resize: vertical; min-height: 72px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ── BUTTON ─────────────────────────────────── */
+    .btn-submit {
+      width: 100%; padding: 12px;
+      background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy) 100%);
+      border: 1px solid var(--gold);
+      border-radius: var(--radius-sm);
+      color: var(--gold);
+      font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 500;
+      letter-spacing: 0.04em;
+      cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 6px;
+      box-shadow: 0 0 20px rgba(212,175,55,0.1);
+    }
+    .btn-submit:hover {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%);
+      color: var(--navy-deep);
+      box-shadow: 0 0 28px var(--gold-glow);
+      transform: translateY(-1px);
+    }
+    .btn-submit:active { transform: translateY(0); }
+
+    /* ── TOAST ──────────────────────────────────── */
+    .toast {
+      display: none; color: #fff; padding: 11px 16px; border-radius: var(--radius-sm);
+      font-size: 13px; margin-top: 14px; text-align: center; font-weight: 400;
+    }
+    .toast.show { display: block; animation: fadeUp 0.3s ease; }
+    .toast.ok    { background: rgba(46,204,113,0.2); border: 1px solid rgba(46,204,113,0.4); color: #2ecc71; }
+    .toast.error { background: rgba(224,85,85,0.2);  border: 1px solid rgba(224,85,85,0.4);  color: var(--red); }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── TERMINLISTE ────────────────────────────── */
+    .list-card { display: flex; flex-direction: column; }
+
+    .filter-bar {
+      padding: 14px 20px 0;
+      display: flex; gap: 6px; flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 5px 14px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 12px; font-weight: 500;
+      font-family: 'Outfit', sans-serif;
+      color: var(--text-mute);
+      cursor: pointer; transition: all 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .filter-btn:hover { border-color: rgba(212,175,55,0.4); color: var(--text-dim); }
+    .filter-btn.aktiv {
+      background: var(--gold-soft);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .termine-liste {
+      padding: 16px 20px 20px; flex: 1;
+      overflow-y: auto;
+      max-height: calc(100vh - 250px);
+    }
+
+    .termin-gruppe { margin-bottom: 28px; }
+
+    .datum-label {
+      font-size: 10.5px; font-weight: 600; color: var(--gold);
+      letter-spacing: 0.14em; text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .datum-label::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(90deg, var(--border) 0%, transparent 100%);
+    }
+
+    /* ── TERMIN KARTE ───────────────────────────── */
+    .termin-karte {
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px; margin-bottom: 8px;
+      display: flex; align-items: flex-start; gap: 16px;
+      transition: all 0.2s;
+      position: relative; overflow: hidden;
+    }
+
+    .termin-karte::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--gold) 0%, transparent 100%);
+      opacity: 0.6;
+    }
+
+    .termin-karte:hover {
+      background: rgba(0, 0, 0, 0.7);
+      border-color: var(--border);
+      transform: translateX(3px);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+    .termin-karte.gesendet::before { background: var(--text-mute); }
+    .termin-karte.gesendet { opacity: 0.55; }
+
+    .termin-zeit {
+      font-size: 19px; font-weight: 600; color: var(--gold);
+      min-width: 64px; line-height: 1.1; letter-spacing: -0.01em;
+    }
+
+    .termin-info { flex: 1; }
+
+    .termin-empfaenger {
+      display: inline-block; font-size: 9.5px; font-weight: 600;
+      padding: 2px 8px; border-radius: 20px; margin-bottom: 5px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .emp-budholzer { background: rgba(45,125,210,0.12); color: #6baee8; border: 1px solid rgba(45,125,210,0.25); }
+    .emp-dichtl    { background: rgba(212,175,55,0.12);  color: var(--gold); border: 1px solid rgba(212,175,55,0.25); }
+    .emp-winter    { background: rgba(46,204,113,0.12);  color: #4dd68c; border: 1px solid rgba(46,204,113,0.25); }
+
+    .termin-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+    .termin-link {
+      font-size: 12px; color: var(--text-mute); text-decoration: none;
+      word-break: break-all; transition: color 0.15s;
+    }
+    .termin-link:hover { color: var(--gold); }
+    .termin-notiz { font-size: 12px; color: var(--text-mute); margin-top: 4px; font-style: italic; font-weight: 300; }
+
+    .gesendet-badge {
+      font-size: 10px; font-weight: 500; color: var(--gold-dim);
+      background: var(--gold-soft); border: 1px solid var(--border);
+      padding: 2px 8px; border-radius: 20px; white-space: nowrap;
+      letter-spacing: 0.04em;
+    }
+
+    .btn-del {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-mute); font-size: 14px; padding: 3px 5px;
+      border-radius: 6px; transition: all 0.15s; line-height: 1;
+    }
+    .btn-del:hover { color: var(--red); background: rgba(224,85,85,0.1); }
+
+    /* ── LEER ───────────────────────────────────── */
+    .leer {
+      text-align: center; padding: 64px 20px; color: var(--text-mute);
+    }
+    .leer-icon { font-size: 36px; margin-bottom: 14px; opacity: 0.4; }
+    .leer p { font-size: 13.5px; line-height: 1.7; font-weight: 300; }
+
+    /* ── RESPONSIVE ─────────────────────────────── */
+    @media (max-width: 800px) {
+      .main-container { grid-template-columns: 1fr; padding: 20px 16px; }
+      header { padding: 0 20px; }
+      .header-center { display: none; }
+      .termine-liste { max-height: 500px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-logo">
+      <div class="logo-mark">✦</div>
+      <div class="logo-text">
+        <span class="logo-title">Sekretariat Winter</span>
+        <span class="logo-sub">Terminkalender</span>
+      </div>
+    </div>
+    <div class="header-center" id="headerDatum"></div>
+  </header>
+
+  <div class="main-container">
+
+    <!-- STATUS -->
+    <div class="status-bar">
+      <div class="status-dot" id="statusDot"></div>
+      <div class="status-text" id="statusText">
+        <strong>Discord Bot</strong> – Verbindung wird geprüft...
+      </div>
+      <div class="status-hint">🔔 Erinnerung 1 Stunde vor jedem Termin</div>
+    </div>
+
+    <!-- FORMULAR -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-header-icon">✏️</div>
+        <h2>Neuer Termin</h2>
+      </div>
+      <div class="form-body">
+        <form id="terminForm">
+
+          <div class="form-group">
+            <label>Empfänger</label>
+            <select id="inp-empfaenger" required>
+              <option value="" disabled selected>– Empfänger wählen –</option>
+              <option value="budholzer">Budholzer</option>
+              <option value="dichtl">Dichtl</option>
+              <option value="winter">Winter</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Name / Person des Termins</label>
+            <input type="text" id="inp-name" placeholder="z. B. Max Kalinke" required />
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Datum</label>
+              <input type="date" id="inp-datum" required />
+            </div>
+            <div class="form-group">
+              <label>Uhrzeit</label>
+              <input type="time" id="inp-uhrzeit" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Discord-Link (optional)</label>
+            <input type="url" id="inp-link" placeholder="https://discord.com/channels/..." />
+          </div>
+
+          <div class="form-group">
+            <label>Notiz (optional)</label>
+            <textarea id="inp-notiz" placeholder="Weitere Informationen..."></textarea>
+          </div>
+
+          <button type="submit" class="btn-submit">
+            <span>✦</span> Termin speichern
+          </button>
+        </form>
+        <div class="toast" id="toast"></div>
+      </div>
+    </div>
+
+    <!-- TERMINLISTE -->
+    <div class="card list-card">
+      <div class="card-header">
+        <div class="card-header-icon">📋</div>
+        <h2>Alle Termine</h2>
+        <span class="count-badge" id="anzahlBadge">0</span>
+      </div>
+
+      <div class="filter-bar">
+        <button class="filter-btn aktiv" onclick="setFilter('alle', this)">Alle</button>
+        <button class="filter-btn" onclick="setFilter('heute', this)">Heute</button>
+        <button class="filter-btn" onclick="setFilter('woche', this)">Diese Woche</button>
+        <button class="filter-btn" onclick="setFilter('budholzer', this)">Budholzer</button>
+        <button class="filter-btn" onclick="setFilter('dichtl', this)">Dichtl</button>
+        <button class="filter-btn" onclick="setFilter('winter', this)">Winter</button>
+      </div>
+
+      <div class="termine-liste" id="termineListe">
+        <div class="leer">
+          <div class="leer-icon">◦</div>
+          <p>Keine Termine vorhanden.<br>Füge links einen neuen Termin hinzu.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
